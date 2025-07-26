@@ -15,13 +15,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from .models import ChatMessage
-from .serializers import LoginSerializer, ChatMessageSerializer,VendorSignupView, ProducerSignupView
+from .serializers import SignupSerializer, LoginSerializer, ChatMessageSerializer
 from django.db.models import Q
 from .serializers import ChatMessageSerializer
 from rest_framework import generics, permissions
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.permissions import AllowAny
+from .serializers import VendorSignupSerializer, ProducerSignupSerializer
+
 
 User = get_user_model()
 
@@ -95,15 +97,6 @@ class SubmitRatingView(APIView):
             return Response({"detail": "Rating submitted successfully."}, status=201)
         return Response(serializer.errors, status=400)
     
-class SignupView(APIView):
-    permission_classes = [AllowAny]
-    def post(self, request):
-        serializer = SignupSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            token = Token.objects.get(user=user)
-            return Response({"message": "User created", "token": token.key}, status=201)
-        return Response(serializer.errors, status=400)
 
 # Login
 class LoginView(APIView):
@@ -198,3 +191,26 @@ class AllUserMessagesView(APIView):
 
         serializer = ChatMessageSerializer(messages, many=True)
         return Response(serializer.data)
+    
+class VendorSignupView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = VendorSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token = Token.objects.get(user=user)
+            return Response({"message": "Vendor created", "token": token.key}, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class ProducerSignupView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = ProducerSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token = Token.objects.get(user=user)
+            return Response({"message": "Producer created", "token": token.key}, status=201)
+        return Response(serializer.errors, status=400)
