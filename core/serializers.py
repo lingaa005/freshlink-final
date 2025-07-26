@@ -99,3 +99,39 @@ class ChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChatMessage
         fields = ['id', 'sender', 'sender_username', 'receiver', 'receiver_username', 'message', 'timestamp']
+
+class VendorSignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    street_location = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'street_location']
+
+    def create(self, validated_data):
+        street_location = validated_data.pop('street_location')
+        user = User.objects.create_user(**validated_data, role='vendor')
+        Vendor.objects.create(user=user, street_location=street_location)
+        Token.objects.create(user=user)
+        return user
+
+
+class ProducerSignupSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    company_name = serializers.CharField(write_only=True)
+    fssai_license = serializers.CharField(write_only=True)
+    contact_info = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'company_name', 'fssai_license', 'contact_info']
+
+    def create(self, validated_data):
+        company_name = validated_data.pop('company_name')
+        fssai_license = validated_data.pop('fssai_license')
+        contact_info = validated_data.pop('contact_info')
+        user = User.objects.create_user(**validated_data, role='producer')
+        Producer.objects.create(user=user, company_name=company_name,
+                                fssai_license=fssai_license, contact_info=contact_info)
+        Token.objects.create(user=user)
+        return user
