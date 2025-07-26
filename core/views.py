@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from .models import ChatMessage
-from .serializers import SignupSerializer, LoginSerializer, ChatMessageSerializer
+from .serializers import LoginSerializer, ChatMessageSerializer,VendorSignupView, ProducerSignupView
 from django.db.models import Q
 from .serializers import ChatMessageSerializer
 from rest_framework import generics, permissions
